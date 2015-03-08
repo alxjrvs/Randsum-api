@@ -5,13 +5,32 @@ import (
 	"math/big"
 )
 
-func RollRandomD6() (n *big.Int) {
-	sides := big.NewInt(6)
-	num, err := rand.Int(rand.Reader, sides)
+type RollParams struct {
+	NumberOfRolls int64
+	DieSides      int64
+}
+
+type TotalResult struct {
+	Rolls []*big.Int
+	Total *big.Int
+}
+
+func RollResult(params RollParams) (result TotalResult) {
+	rollsArray := make([]*big.Int, params.NumberOfRolls)
+	total := big.NewInt(0)
+	for i, _ := range rollsArray {
+		roll := RollSingleD(params.DieSides)
+		rollsArray[i] = roll
+		total.Add(total, roll)
+	}
+	r := TotalResult{rollsArray, total}
+	return r
+}
+
+func RollSingleD(sides int64) (n *big.Int) {
+	bigSides := big.NewInt(sides)
+	num, _ := rand.Int(rand.Reader, bigSides)
 	offset := big.NewInt(1)
 	num.Add(num, offset)
-	if err != nil {
-		panic(err)
-	}
 	return num
 }

@@ -5,6 +5,7 @@ import (
 )
 
 func main() {
-	result := RollRandomD6()
+	params := RollParams{2, 20}
+	result := RollResult(params)
 	fmt.Println(result)
 }
