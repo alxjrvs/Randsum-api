@@ -1,11 +1,12 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"net/http"
+	"os"
 )
 
 func main() {
-	params := RollParams{2, 20}
-	result := RollResult(params)
-	fmt.Println(result)
+	router := NewRouter()
+	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), router))
 }

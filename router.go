@@ -1,10 +1,12 @@
 package main
 
 import (
-	//"encoding/json"
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
+	"net/url"
+	"strconv"
 )
 
 type Route struct {
@@ -38,5 +40,23 @@ func NewRouter() *mux.Router {
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello!")
+	//params := paramsParser(r)
+	rawParams := paramsParser(r)
+	params := RollParams{
+		rawParams["number"],
+		rawParams["sides"],
+	}
+	result := RollResult(params)
+	json.NewEncoder(w).Encode(result)
+	fmt.Println(result)
+}
+
+func paramsParser(r *http.Request) map[string]int64 {
+	vals, _ := url.ParseQuery(r.URL.RawQuery)
+	iv := map[string]int64{}
+	for k, _ := range vals {
+		v, _ := strconv.Atoi(vals[k][0])
+		iv[k] = int64(v)
+	}
+	return iv
 }

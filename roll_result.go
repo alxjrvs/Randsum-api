@@ -11,8 +11,8 @@ type RollParams struct {
 }
 
 type TotalResult struct {
-	Rolls []*big.Int
-	Total *big.Int
+	Rolls []*big.Int `json:"rolls"`
+	Total *big.Int   `json:"total"`
 }
 
 func RollResult(params RollParams) (result TotalResult) {
