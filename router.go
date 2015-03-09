@@ -96,8 +96,11 @@ func formatParams(rawParams map[string]string, errors map[string][]string) (map[
 	parsedParams := map[string]int64{}
 	for k, v := range rawParams {
 		value, err := strconv.Atoi(v)
+		if value <= 0 {
+			errors, valid = logError(errors, "cannot_be_below_zero", k)
+		}
 		if err != nil {
-			errors, valid = logError(errors, "not_a_number", v)
+			errors, valid = logError(errors, "not_a_number", k)
 		}
 		parsedParams[k] = int64(value)
 	}
