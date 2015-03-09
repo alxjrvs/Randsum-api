@@ -15,6 +15,14 @@ type TotalResult struct {
 	Total *big.Int   `json:"total"`
 }
 
+func CriticalHit() (result TotalResult) {
+	numbers := make([]*big.Int, 1)
+	totalResult := big.NewInt(20)
+	numbers[0] = totalResult
+	r := TotalResult{numbers, totalResult}
+	return r
+}
+
 func RollResult(params RollParams) (result TotalResult) {
 	rollsArray := make([]*big.Int, params.NumberOfRolls)
 	total := big.NewInt(0)

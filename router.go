@@ -22,8 +22,14 @@ var routes = Routes{
 	Route{
 		"Index",
 		"GET",
-		"/",
+		"/api/v1/roll",
 		Index,
+	},
+	Route{
+		"Pun",
+		"GET",
+		"/api/v1/puns",
+		PunIndex,
 	},
 }
 
@@ -39,8 +45,13 @@ func NewRouter() *mux.Router {
 	return router
 }
 
+func PunIndex(w http.ResponseWriter, r *http.Request) {
+	result := CriticalHit()
+	json.NewEncoder(w).Encode(result)
+	fmt.Println(result)
+}
+
 func Index(w http.ResponseWriter, r *http.Request) {
-	//params := paramsParser(r)
 	rawParams := paramsParser(r)
 	params := RollParams{
 		rawParams["number"],
