@@ -9,6 +9,10 @@
 		{
 			"ImportPath": "github.com/gorilla/mux",
 			"Rev": "8a875a034c69b940914d83ea03d3f1299b4d094b"
+		},
+		{
+			"ImportPath": "github.com/rs/cors",
+			"Rev": "6e0c3cb65fc0fdb064c743d176a620e3ca446dfb"
 		}
 	]
 }

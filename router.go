@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	"net/http"
 	"strconv"
 )
@@ -39,24 +40,33 @@ var routes = Routes{
 
 func NewRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowCredentials: true,
+	})
 	for _, route := range routes {
+		handler := c.Handler(route.HandlerFunc)
 		router.
 			Methods(route.Method).
 			Path(route.Pattern).
 			Name(route.Name).
-			Handler(route.HandlerFunc)
+			Handler(handler)
 	}
 	return router
 }
 
 func PunIndex(w http.ResponseWriter, r *http.Request) {
 	result := CriticalHit()
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
 }
 
 func DefaultIndex(w http.ResponseWriter, r *http.Request) {
 	params := RollParams{1, 20}
 	result := RollResult(params)
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(result)
 }
 
@@ -66,6 +76,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err)
 	} else {
 		result := RollResult(params)
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(result)
 	}
 }
