@@ -2,10 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
-	"net/url"
 	"strconv"
 )
 
@@ -22,7 +20,7 @@ var routes = Routes{
 	Route{
 		"Index",
 		"GET",
-		"/api/v1/roll",
+		"/api/v1/roll/{roll}/d/{sides}",
 		Index,
 	},
 	Route{
@@ -48,26 +46,81 @@ func NewRouter() *mux.Router {
 func PunIndex(w http.ResponseWriter, r *http.Request) {
 	result := CriticalHit()
 	json.NewEncoder(w).Encode(result)
-	fmt.Println(result)
+}
+
+func DefaultIndex(w http.ResponseWriter, r *http.Request) {
+	params := RollParams{1, 20}
+	result := RollResult(params)
+	json.NewEncoder(w).Encode(result)
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	rawParams := paramsParser(r)
-	params := RollParams{
-		rawParams["number"],
-		rawParams["sides"],
+	params, err, valid := paramsParser(r)
+	if valid == false {
+		json.NewEncoder(w).Encode(err)
+	} else {
+		result := RollResult(params)
+		json.NewEncoder(w).Encode(result)
 	}
-	result := RollResult(params)
-	json.NewEncoder(w).Encode(result)
-	fmt.Println(result)
 }
 
-func paramsParser(r *http.Request) map[string]int64 {
-	vals, _ := url.ParseQuery(r.URL.RawQuery)
-	iv := map[string]int64{}
-	for k, _ := range vals {
-		v, _ := strconv.Atoi(vals[k][0])
-		iv[k] = int64(v)
+func paramsParser(r *http.Request) (RollParams, map[string][]string, bool) {
+	rawParams, errors, valid := paramsValidator(r)
+	roll := rawParams["roll"]
+	sides := rawParams["sides"]
+	params := RollParams{roll, sides}
+
+	return params, errors, valid
+}
+
+func getParams(r *http.Request) map[string]string {
+	return mux.Vars(r)
+}
+
+func paramsValidator(r *http.Request) (map[string]int64, map[string][]string, bool) {
+	rawParams := getParams(r)
+	errors := map[string][]string{}
+	errors, valid := checkRequired(rawParams, errors)
+	if valid == false {
+		return nil, errors, valid
 	}
-	return iv
+	parsedParams, errors, valid := formatParams(rawParams, errors)
+	if valid == false {
+		return nil, errors, valid
+	}
+	return parsedParams, errors, true
+}
+
+func formatParams(rawParams map[string]string, errors map[string][]string) (map[string]int64, map[string][]string, bool) {
+	valid := true
+	parsedParams := map[string]int64{}
+	for k, v := range rawParams {
+		value, err := strconv.Atoi(v)
+		if err != nil {
+			errors, valid = logError(errors, "not_a_number", v)
+		}
+		parsedParams[k] = int64(value)
+	}
+
+	return parsedParams, errors, valid
+}
+
+func checkRequired(rawParams map[string]string, errors map[string][]string) (map[string][]string, bool) {
+	valid := true
+	for _, p := range requiredParams() {
+		val := rawParams[p]
+		if val == "" {
+			errors, valid = logError(errors, "required_param", p)
+		}
+	}
+	return errors, valid
+}
+
+func logError(errors map[string][]string, key string, val string) (map[string][]string, bool) {
+	errors[key][len(errors)] = val
+	return errors, false
+}
+
+func requiredParams() []string {
+	return []string{"roll", "sides"}
 }
