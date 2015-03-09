@@ -29,6 +29,12 @@ var routes = Routes{
 		"/api/v1/puns",
 		PunIndex,
 	},
+	Route{
+		"default",
+		"GET",
+		"/api/v1/roll",
+		DefaultIndex,
+	},
 }
 
 func NewRouter() *mux.Router {
