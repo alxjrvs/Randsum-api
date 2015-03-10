@@ -21,19 +21,19 @@ var routes = Routes{
 	Route{
 		"Index",
 		"GET",
-		"/api/v1/roll/{roll}/d/{sides}",
+		"/v1/roll/{roll}/d/{sides}",
 		Index,
 	},
 	Route{
 		"Pun",
 		"GET",
-		"/api/v1/puns",
+		"/v1/puns",
 		PunIndex,
 	},
 	Route{
 		"default",
 		"GET",
-		"/api/v1/roll",
+		"/v1/roll",
 		DefaultIndex,
 	},
 }
